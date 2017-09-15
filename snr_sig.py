@@ -1,0 +1,59 @@
+'''
+Input: a folder containing the output pickle files of s2_pipeline_tester.py
+
+Calculates the detection significance and mass uncertainity for each pkl file by fitting a parabola to delta chi square distribution
+
+ 
+
+'''
+import numpy as np
+import pickle,gzip,glob
+import sys
+from scipy.optimize import curve_fit
+in_folder = sys.argv[1]
+
+files = glob.glob('%s/*gz'%(in_folder))
+
+def fit_func(x,a,b,c):
+    return a*(x-b)**2 +c
+
+mass_uncen = np.zeros(len(files))
+det_sig = np.zeros(len(files))
+for i,ff in enumerate(files):
+
+    data = pickle.load(gzip.open('%s'%(ff)))
+    true_mass = np.median(data['clustermasses'])
+    result = data['results']
+    mass = lnlike = np.zeros(len(result.keys()))
+    
+    res_arr = np.zeros( (len(result.keys()),2) )
+    cnt =0
+    for key in sorted( result.keys() ):
+        res_arr[cnt,0] = float(key)
+        res_arr[cnt,1] = float(result[key])
+        cnt += 1
+    mass = np.asarray( res_arr[:,0] )
+    lnlike = np.asarray( res_arr[:,1] )
+    best_fit = mass[np.argmax(lnlike)]
+    delta_chisq = 2*(max(lnlike)-lnlike)
+    inds = np.where(delta_chisq<=10)[0]
+#delta_chisq = delta_chisq[inds]
+    params = curve_fit(fit_func,mass[inds],delta_chisq[inds],p0=[1,best_fit,0])[0]
+    m_ip = np.arange(min(mass[inds]),max(mass[inds]),0.01)
+    res_ip = fit_func(m_ip,params[0],params[1],params[2])
+    linds, uinds = np.where(m_ip<=best_fit)[0], np.where(m_ip>=best_fit)[0]
+    req_val =1
+    l_err = np.interp(req_val,res_ip[linds][::-1], m_ip[linds][::-1])
+    u_err = np.interp(req_val,res_ip[uinds], m_ip[uinds])
+    width = u_err - l_err
+    mass_uncen[i] = width/best_fit
+    mass_uncen[i] = mass_uncen[i]/2.
+    det_sig[i] = max(lnlike) - lnlike[np.where(mass ==0)[0]]
+    det_sig[i] = np.sqrt(2*det_sig[i])
+    #print "det_sig = %s"%(det_sig)
+    #from pylab import *
+    #plot(mass[inds],delta_chisq[inds],'k');plot(m_ip,res_ip,'r');axvline(x=l_err,color='k',linestyle ='--');axvline(x=u_err,color='k',linestyle ='--');show()
+    #print mass_uncen
+
+print "mass uncertainity = %s"%(np.mean(mass_uncen))
+print "detection significance = %s"%(np.mean(det_sig)) 
