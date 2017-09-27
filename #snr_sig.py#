@@ -21,7 +21,7 @@ def fit_func(x,a,b,c):
 mass_uncen = np.zeros(len(files))
 det_sig = np.zeros(len(files))
 for i,ff in enumerate(files):
-
+    # loading input data
     data = pickle.load(gzip.open('%s'%(ff)))
     true_mass = np.median(data['clustermasses'])
     result = data['results']
@@ -38,7 +38,6 @@ for i,ff in enumerate(files):
     best_fit = mass[np.argmax(lnlike)]
     delta_chisq = 2*(max(lnlike)-lnlike)
     inds = np.where(delta_chisq<=10)[0]
-#delta_chisq = delta_chisq[inds]
     params = curve_fit(fit_func,mass[inds],delta_chisq[inds],p0=[1,best_fit,0])[0]
     m_ip = np.arange(min(mass[inds]),max(mass[inds]),0.01)
     res_ip = fit_func(m_ip,params[0],params[1],params[2])

@@ -1,5 +1,5 @@
 '''
-Input: a folder containing the output pickle files of s2_pipeline_tester.py (which has log likelihood and mass values)
+Input: a folder containing the output pickle files of s2_pipeline_tester.py
 
 Calculates the detection significance and mass uncertainity for each pkl file by fitting a parabola to delta chi square distribution
 
@@ -12,10 +12,9 @@ import sys
 from scipy.optimize import curve_fit
 in_folder = sys.argv[1]
 
-files = glob.glob('%s/*gz'%(in_folder)) # file which has input
+files = glob.glob('%s/*gz'%(in_folder))
 
-#fitting parabola
-def fit_func(x,a,b,c):           
+def fit_func(x,a,b,c):
     return a*(x-b)**2 +c
 
 mass_uncen = np.zeros(len(files))
