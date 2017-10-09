@@ -14,6 +14,9 @@ in_folder = sys.argv[1]
 
 files = glob.glob('%s/*gz'%(in_folder)) # file which has input
 
+#!!! OVERWRITING THE FILES!!!
+
+
 #fitting parabola
 def fit_func(x,a,b,c):           
     return a*(x-b)**2 +c
