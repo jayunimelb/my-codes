@@ -24,12 +24,11 @@ for key in sorted( results.keys() ):
 		cnt += 1
 
 
-mass = np.asarray( res_arr[:,0] );lnlike = np.asarray( res_arr[:,1] );best_fit = mass[np.argmax(lnlike)];delta_chisq = 2*(max(lnlike)-lnlike);inds = np.where(delta_chisq<2.5)[0] # it is hard coded!!!
+mass = np.asarray( res_arr[:,0] );lnlike = np.asarray( res_arr[:,1] );best_fit = mass[np.argmax(lnlike)];delta_chisq = 2*(max(lnlike)-lnlike);inds = np.where(delta_chisq<100)[0] # it is hard coded!!!
 
 params = curve_fit(fit_func,mass[inds],delta_chisq[inds],p0=[1,best_fit])[0]
 m_ip = np.arange(min(mass[inds]),max(mass[inds]),0.01);res_ip = fit_func(m_ip,params[0],params[1]);linds, uinds = np.where(m_ip<=best_fit)[0], np.where(m_ip>=best_fit)[0];req_val =1
 l_err = np.interp(req_val,res_ip[linds][::-1], m_ip[linds][::-1]);u_err = np.interp(req_val,res_ip[uinds], m_ip[uinds]); width = u_err - l_err
-print l_err;print u_err#;quit()
 print "mass uncen = %s"%(width/2.)
 plot(mass,delta_chisq,'k*');plot(m_ip,res_ip,'r');show()
 
