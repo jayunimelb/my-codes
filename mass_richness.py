@@ -1,0 +1,26 @@
+'''
+Using richness-mass scaling relation calculate mass from lambda
+Get the redshift of the covfiles and round off the redshift 
+
+
+'''
+mass_redmapper_simulation = 1
+keys = pickle.load(gzip.open(covfiles[0])).keys()
+z_cov_arr = []
+
+for key in keys:
+        z_cov_arr.append(float(key.split(',')[1]))
+z_cov_arr = np.asarray(z_cov_arr)
+#print z_cov_arr;quit()                                                                                                                                                                                                                                                         
+if mass_redmapper_simulation:
+        lamda_0, alpha, beta, A = 30, 1.18, 0.18, 2.2e+14
+        data_file = 'data/sanjay_maps_201705xx/final_maps/20170605_downsample_x2_TP/map_150.pkl.gz_cutouts_150ghz_no_downsamplingredmapper_clusters'
+        cutouts =  pickle.load(gzip.open(data_file,'rb'))['cutouts']
+        M_200_list,z_L_list = np.zeros(len(cutouts.keys())),np.zeros(len(cutouts.keys()))
+        z_0 = 0.5
+        for i,key in enumerate(sorted(cutouts.keys())):
+                lamda,z = key[3],key[4]
+                M_200_list[i] = A*pow((lamda/lamda_0),alpha)*pow(((1+z)/(1+z_0)),beta)
+                z_cov_arr[np.argmin(abs(z_cov_arr-z))]
+                z_L_list[i] =z_cov_arr[np.argmin(abs(z_cov_arr-z))]
+
