@@ -1,0 +1,6 @@
+import numpy as np
+import sys
+
+
+# input image file, which is an nd array
+image_file = 
